@@ -13,8 +13,10 @@ In nodejs:
 
 In the browser, include the following, and access the constructor with _XXH_:
 
-`<script src="/your/path/to/uint32.js"></script>`
-`<script src="/your/path/to/xxhash.js"></script>`
+```javascript
+<script src="/your/path/to/uint32.js"></script>
+<script src="/your/path/to/xxhash.js"></script>
+```
 
 NB. xxhashjs depends on the [uint32 library](https://github.com/pierrec/js-cuint) that emulates unsigned 32 bits integers in Javascript.
 
@@ -22,11 +24,14 @@ NB. xxhashjs depends on the [uint32 library](https://github.com/pierrec/js-cuint
 ## Examples
 
 * In one step:
-```var h = XXH( 'abcd', 0xABCD ).toString(16)	// seed = 0xABCD```
+```javascript
+var h = XXH( 'abcd', 0xABCD ).toString(16)	// seed = 0xABCD
+```
 > 0xCDA8FAE4
 
 * In several steps (useful in conjunction of NodeJS streams):
-```var H = XXH( 0xABCD )	// seed = 0xABCD
+```javascript
+var H = XXH( 0xABCD )	// seed = 0xABCD
 var h = H.update( 'abcd' ).digest().toString(16)
 ```
 > 0xCDA8FAE4
