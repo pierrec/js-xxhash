@@ -1,5 +1,5 @@
 {
-  "name": "xxhash",
+  "name": "xxhashjs",
   "version": "0.0.0",
   "description": "xxHash in Javascript",
   "main": "xxhash.js",
