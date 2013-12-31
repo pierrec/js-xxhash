@@ -1,0 +1,25 @@
+{
+  "name": "xxhash",
+  "version": "0.0.0",
+  "description": "xxHash in Javascript",
+  "main": "xxhash.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pierrec/js-xxhash"
+  },
+  "keywords": [
+    "xxhash"
+  ],
+  "author": "Pierre Curto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pierrec/js-xxhash/issues"
+  },
+  "homepage": "https://github.com/pierrec/js-xxhash"
+, "dependencies": {
+    "cuint": "latest"
+  }
+}

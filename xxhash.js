@@ -8,10 +8,14 @@
 
 	var UINT32 = typeof root['UINT32'] == 'function'
 		? root['UINT32']
-		: require('../js-cuint').UINT32
+		: require('cuint').UINT32
 
+	/*
+		Merged this sequence of method calls as it speeds up
+		the calculations by a factor of 2
+	 */
 	// this.v1.add( other.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1);
-	UINT32.prototype.xxh = function (other) {
+	UINT32.prototype.xxh_update = function (other) {
 		var b00 = PRIME32_2._low
 		var b16 = PRIME32_2._high
 
@@ -64,7 +68,7 @@
 	 * @constructor
 	 * or
 	 * @param {Object|String} input data
-	 * @param {Number} seed
+	 * @param {Number|UINT32} seed
 	 * @return ThisExpression
 	 * or
 	 * @return {UINT32} xxHash
@@ -72,6 +76,9 @@
 	function XXH () {
 		if (arguments.length == 2)
 			return new XXH( arguments[1] ).update( arguments[0] ).digest()
+
+		if (!(this instanceof XXH))
+			return new XXH( arguments[0] )
 
 		init.call(this, arguments[0])
 	}
@@ -149,7 +156,7 @@
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v1.xxh(u)
+			this.v1.xxh_update(u)
 
 			if (isString) {
 				u.fromBits(
@@ -162,7 +169,7 @@
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v2.xxh(u)
+			this.v2.xxh_update(u)
 
 			if (isString) {
 				u.fromBits(
@@ -175,7 +182,7 @@
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v3.xxh(u)
+			this.v3.xxh_update(u)
 
 			if (isString) {
 				u.fromBits(
@@ -188,7 +195,7 @@
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v4.xxh(u)
+			this.v4.xxh_update(u)
 
 			p += 16 - this.memsize
 			this.memsize = 0
@@ -212,7 +219,7 @@
 					)
 				}
 				// this.v1.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v1.xxh(u); p+=4
+				this.v1.xxh_update(u); p+=4
 
 				if (isString) {
 					u.fromBits(
@@ -226,7 +233,7 @@
 					)
 				}
 				// this.v2.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v2.xxh(u); p+=4
+				this.v2.xxh_update(u); p+=4
 
 				if (isString) {
 					u.fromBits(
@@ -240,7 +247,7 @@
 					)
 				}
 				// this.v3.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v3.xxh(u); p+=4
+				this.v3.xxh_update(u); p+=4
 
 				if (isString) {
 					u.fromBits(
@@ -254,7 +261,7 @@
 					)
 				}
 				// this.v4.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v4.xxh(u); p+=4
+				this.v4.xxh_update(u); p+=4
 			} while (p <= limit)
 		}
 
@@ -334,6 +341,9 @@
 
 		h = h32.clone().shiftRight(16)
 		h32.xor(h)
+
+		// Reset the state
+		this.init( this.seed )
 
 		return h32
 	}
