@@ -15,17 +15,17 @@
 		the calculations by a factor of 2
 	 */
 	// this.v1.add( other.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1);
-	UINT32.prototype.xxh_update = function (other) {
+	UINT32.prototype.xxh_update = function (low, high) {
 		var b00 = PRIME32_2._low
 		var b16 = PRIME32_2._high
 
 		var c16, c00
-		c00 = other._low * b00
+		c00 = low * b00
 		c16 = c00 >>> 16
 
-		c16 += other._high * b00
+		c16 += high * b00
 		c16 &= 0xFFFF		// Not required but improves performance
-		c16 += other._low * b16
+		c16 += low * b16
 
 		var a00 = this._low + (c00 & 0xFFFF)
 		var a16 = a00 >>> 16
@@ -114,8 +114,6 @@
 		var p = 0
 		var len = input.length
 		var bEnd = p + len
-		// Holder for the unsigned read from the input
-		var u = new UINT32
 
 		this.total_len += len
 
@@ -146,56 +144,52 @@
 			var p32 = 0
 
 			if (isString) {
-				u.fromBits(
+				this.v1.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
 			} else {
-				u.fromBits(
+				this.v1.xxh_update(
 					(input[p+1] << 8) | input[p]
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v1.xxh_update(u)
 
 			if (isString) {
-				u.fromBits(
+				this.v2.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
 			} else {
-				u.fromBits(
+				this.v2.xxh_update(
 					(input[p+1] << 8) | input[p]
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v2.xxh_update(u)
 
 			if (isString) {
-				u.fromBits(
+				this.v3.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
 			} else {
-				u.fromBits(
+				this.v3.xxh_update(
 					(input[p+1] << 8) | input[p]
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v3.xxh_update(u)
 
 			if (isString) {
-				u.fromBits(
+				this.v4.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
 			} else {
-				u.fromBits(
+				this.v4.xxh_update(
 					(input[p+1] << 8) | input[p]
 				,	(input[p+3] << 8) | input[p+2]
 				)
 			}
-			this.v4.xxh_update(u)
 
 			p += 16 - this.memsize
 			this.memsize = 0
@@ -208,60 +202,56 @@
 			do
 			{
 				if (isString) {
-					u.fromBits(
+					this.v1.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
 				} else {
-					u.fromBits(
+					this.v1.xxh_update(
 						(input[p+1] << 8) | input[p]
 					,	(input[p+3] << 8) | input[p+2]
 					)
 				}
-				// this.v1.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v1.xxh_update(u); p+=4
+				p += 4
 
 				if (isString) {
-					u.fromBits(
+					this.v2.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
 				} else {
-					u.fromBits(
+					this.v2.xxh_update(
 						(input[p+1] << 8) | input[p]
 					,	(input[p+3] << 8) | input[p+2]
 					)
 				}
-				// this.v2.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v2.xxh_update(u); p+=4
+				p += 4
 
 				if (isString) {
-					u.fromBits(
+					this.v3.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
 				} else {
-					u.fromBits(
+					this.v3.xxh_update(
 						(input[p+1] << 8) | input[p]
 					,	(input[p+3] << 8) | input[p+2]
 					)
 				}
-				// this.v3.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v3.xxh_update(u); p+=4
+				p += 4
 
 				if (isString) {
-					u.fromBits(
+					this.v4.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
 				} else {
-					u.fromBits(
+					this.v4.xxh_update(
 						(input[p+1] << 8) | input[p]
 					,	(input[p+3] << 8) | input[p+2]
 					)
 				}
-				// this.v4.add( u.multiply(PRIME32_2) ).rotl(13).multiply(PRIME32_1); p += 4
-				this.v4.xxh_update(u); p+=4
+				p += 4
 			} while (p <= limit)
 		}
 
