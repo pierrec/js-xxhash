@@ -95,4 +95,15 @@ describe('add method', function () {
 
   })
 
+  describe('high bit+high bit 2', function () {
+
+    it('should return n', function (done) {
+      var u = UINT32('326648991').add( UINT32('265443576') )
+
+      assert.equal( u.toNumber(), 592092567 )
+      done()
+    })
+
+  })
+
 })

@@ -48,4 +48,26 @@ describe('shiftLeft method', function () {
 
   })
 
+  describe('1<<31', function () {
+
+    it('should return 2^31', function (done) {
+      var u = UINT32(1).shiftLeft(31)
+
+      assert.equal( u.toString(16), '80000000' )
+      done()
+    })
+
+  })
+
+  describe('9<<28', function () {
+
+    it('should return 2^31', function (done) {
+      var u = UINT32(9).shiftLeft(28)
+
+      assert.equal( u.toString(16), '90000000' )
+      done()
+    })
+
+  })
+
 })

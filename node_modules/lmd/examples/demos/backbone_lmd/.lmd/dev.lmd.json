@@ -1,0 +1,42 @@
+{
+    "name": "Development build",
+
+    "description": "This example uses file glob and string interpolation.\nSee:\n  - examples/features/interpolation\n  - examples/features/glob",
+
+    "root": "../js/",
+    "output": "../compiled/dev.lmd.js",
+
+    "modules": {
+        "_": {
+            "path": "../assets/lodash.min.js",
+            "exports": "_"
+        },
+        "underscore": "@_",
+
+        "$": {
+            "path": "lib/jquery/jquery.min.js",
+            "exports": "jQuery"
+        },
+
+        "backbone": {
+            "path": "lib/backbone/backbone.js",
+            "require": {
+                "underscore": "_",
+                "jQuery": "$"
+            },
+            "exports": "Backbone"
+        },
+        "store": "lib/backbone/localstorage.js",
+
+        "main": "main.js",
+        "common": "common.js",
+
+        "<%= file %><%= dir[0][0].toUpperCase() %><%= dir[0].slice(1, -1) %>": "{collections,models,routers,templates,views}/**/*.{js,html}"
+    },
+    "main": "main",
+
+    "shortcuts": true,
+
+    "log": true,
+    "warn": true
+}

@@ -8,7 +8,7 @@ describe('negate method', function () {
     it('should return 0', function (done) {
       var u = UINT32(0).negate()
 
-      assert.equal( u.toNumber(), -65536 )
+      assert.equal( u.toNumber(), 0 )
       done()
     })
 
@@ -16,7 +16,7 @@ describe('negate method', function () {
 
   describe('1', function () {
 
-    it('should return 0', function (done) {
+    it('should return -1', function (done) {
       var u = UINT32(1).negate()
 
       assert.equal( u.toNumber(), -1 )
@@ -27,7 +27,7 @@ describe('negate method', function () {
 
   describe('low bit', function () {
 
-    it('should return n', function (done) {
+    it('should return -n', function (done) {
       var u = UINT32(3).negate()
 
       assert.equal( u.toNumber(), -3 )
@@ -38,11 +38,11 @@ describe('negate method', function () {
 
   describe('high bit', function () {
 
-    it('should return n', function (done) {
+    it('should return -n', function (done) {
       var n = Math.pow(2, 17)
       var u = UINT32(n).negate()
 
-      assert.equal( u.toNumber(), -196608 )
+      assert.equal( u.toNumber(), -n )
       done()
     })
 

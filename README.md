@@ -14,11 +14,8 @@ In nodejs:
 In the browser, include the following, and access the constructor with _XXH_:
 
 ```javascript
-<script src="/your/path/to/uint32.js"></script>
-<script src="/your/path/to/xxhash.js"></script>
+<script src="/your/path/to/xxhash.lmd.js"></script>
 ```
-
-NB. xxhashjs depends on the [uint32 library](https://github.com/pierrec/js-cuint) that emulates unsigned 32 bits integers in Javascript.
 
 
 ## Examples
@@ -35,6 +32,10 @@ var H = XXH( 0xABCD )	// seed = 0xABCD
 var h = H.update( 'abcd' ).digest().toString(16)
 ```
 > 0xCDA8FAE4
+
+* More examples in the examples directory:
+	* Compute xxHash from a file data
+	* Use xxHashjs in the browser
 
 
 ## Usage
@@ -65,8 +66,8 @@ Once `digest()` has been called, the object can be reused. The same seed will be
 Initialize the XXH object with the given seed. The seed can either be a number or a UINT32 object.
 * `XXH.update(<data>)`
 Add data for hashing. The data can either be a string or a NodeJS Buffer object.
-* `XXH.digest()`
-Finalize the hash calculations
+* `XXH.digest()` (_UINT32_)
+Finalize the hash calculations and returns an UINT32 object. The hash value can be retrived with toString(<radix>).
 
 
 ## License

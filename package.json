@@ -1,10 +1,11 @@
 {
   "name": "xxhashjs",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "xxHash in Javascript",
   "main": "xxhash.js",
   "scripts": {
     "test": "mocha"
+  , "prepublish": "lmd build xxhash; lmd build xxhash.min"
   },
   "repository": {
     "type": "git",
@@ -21,5 +22,8 @@
   "homepage": "https://github.com/pierrec/js-xxhash"
 , "dependencies": {
     "cuint": "latest"
+  }
+, "devDependencies": {
+    "lmd": "1.11.x"
   }
 }

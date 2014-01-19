@@ -48,4 +48,48 @@ describe('shiftRight method', function () {
 
   })
 
+  describe('2^31>>31', function () {
+
+    it('should return 1', function (done) {
+      var u = UINT32('80000000', 16).shiftRight(31)
+
+      assert.equal( u.toNumber(), 1 )
+      done()
+    })
+
+  })
+
+  describe('2^28>>28', function () {
+
+    it('should return 1', function (done) {
+      var u = UINT32('10000000', 16).shiftRight(28)
+
+      assert.equal( u.toNumber(), 1 )
+      done()
+    })
+
+  })
+
+  describe('2^31+2^28>>31', function () {
+
+    it('should return 1', function (done) {
+      var u = UINT32('90000000', 16).shiftRight(31)
+
+      assert.equal( u.toNumber(), 1 )
+      done()
+    })
+
+  })
+
+  describe('2^31+2^28>>28', function () {
+
+    it('should return 9', function (done) {
+      var u = UINT32('90000000', 16).shiftRight(28)
+
+      assert.equal( u.toNumber(), 9 )
+      done()
+    })
+
+  })
+
 })

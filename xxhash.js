@@ -6,9 +6,7 @@
  */
 ;(function (root) {
 
-	var UINT32 = typeof root['UINT32'] == 'function'
-		? root['UINT32']
-		: require('cuint').UINT32
+	var UINT32 = require('cuint').UINT32
 
 	/*
 		Merged this sequence of method calls as it speeds up
@@ -148,43 +146,31 @@
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
-			} else {
-				this.v1.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-			}
-
-			if (isString) {
 				this.v2.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
-			} else {
-				this.v2.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-			}
-
-			if (isString) {
 				this.v3.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
-			} else {
-				this.v3.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-			}
-
-			if (isString) {
 				this.v4.xxh_update(
 					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 				)
 			} else {
+				this.v1.xxh_update(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				)
+				this.v2.xxh_update(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				)
+				this.v3.xxh_update(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				)
 				this.v4.xxh_update(
 					(input[p+1] << 8) | input[p]
 				,	(input[p+3] << 8) | input[p+2]
@@ -206,46 +192,37 @@
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
-				} else {
-					this.v1.xxh_update(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					)
-				}
-				p += 4
-
-				if (isString) {
+					p += 4
 					this.v2.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
-				} else {
-					this.v2.xxh_update(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					)
-				}
-				p += 4
-
-				if (isString) {
+					p += 4
 					this.v3.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
-				} else {
-					this.v3.xxh_update(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					)
-				}
-				p += 4
-
-				if (isString) {
+					p += 4
 					this.v4.xxh_update(
 						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
 					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
 					)
 				} else {
+					this.v1.xxh_update(
+						(input[p+1] << 8) | input[p]
+					,	(input[p+3] << 8) | input[p+2]
+					)
+					p += 4
+					this.v2.xxh_update(
+						(input[p+1] << 8) | input[p]
+					,	(input[p+3] << 8) | input[p+2]
+					)
+					p += 4
+					this.v3.xxh_update(
+						(input[p+1] << 8) | input[p]
+					,	(input[p+3] << 8) | input[p+2]
+					)
+					p += 4
 					this.v4.xxh_update(
 						(input[p+1] << 8) | input[p]
 					,	(input[p+3] << 8) | input[p+2]
