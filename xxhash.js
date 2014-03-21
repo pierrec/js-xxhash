@@ -95,7 +95,7 @@
 		this.v4 = this.seed.clone().subtract(PRIME32_1)
 		this.total_len = 0
 		this.memsize = 0
-		this.memory = null
+		this.memory = new Buffer(16)
 
 		return this
 	}
@@ -113,9 +113,11 @@
 		var len = input.length
 		var bEnd = p + len
 
+		if (len == 0) return this
+
 		this.total_len += len
 
-		if (this.memory == null && this.memsize == 0) this.memory = isString ? '' : new Buffer(16)
+		if (this.memsize == 0 && isString) this.memory = ''
 
 		if (this.memsize + len < 16)   // fill in tmp buffer
 		{
@@ -140,45 +142,51 @@
 			}
 
 			var p32 = 0
-
 			if (isString) {
 				this.v1.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v2.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v3.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v4.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
 			} else {
 				this.v1.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v2.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v3.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v4.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
 			}
 
 			p += 16 - this.memsize
 			this.memsize = 0
+			if (isString) this.memory = ''
 		}
 
 		if (p <= bEnd - 16)

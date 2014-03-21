@@ -183,6 +183,8 @@ window['XXH'] = require('xxhash')
 		if ( !(this instanceof UINT32) )
 			return new UINT32(l, h)
 
+		this._low = 0
+		this._high = 0
 		this.remainder = null
 		if (typeof h == 'undefined')
 			return fromNumber.call(this, l)
@@ -359,16 +361,21 @@ window['XXH'] = require('xxhash')
 		if ( (other._low == 0) && (other._high == 0) ) throw Error('division by zero')
 
 		// other == 1
-		if (other._high == 0 && other._low == 1) return this
+		if (other._high == 0 && other._low == 1) {
+			this.remainder = new UINT32(0)
+			return this
+		}
 
 		// other > this: 0
 		if ( other.gt(this) ) {
+			this.remainder = new UINT32(0)
 			this._low = 0
 			this._high = 0
 			return this
 		}
 		// other == this: 1
 		if ( this.eq(other) ) {
+			this.remainder = new UINT32(0)
 			this._low = 1
 			this._high = 0
 			return this
@@ -397,7 +404,7 @@ window['XXH'] = require('xxhash')
 			if ( !this.remainder.lt(_other) ) {
 				this.remainder.subtract(_other)
 				// Update the current result
-				if (i > 16) {
+				if (i >= 16) {
 					this._high |= 1 << (i - 16)
 				} else {
 					this._low |= 1 << i
@@ -502,14 +509,14 @@ window['XXH'] = require('xxhash')
 	 */
 	UINT32.prototype.shiftRight = UINT32.prototype.shiftr = function (n) {
 		if (n > 16) {
-			this._low = this._high >>> (n - 16)
+			this._low = this._high >> (n - 16)
 			this._high = 0
 		} else if (n == 16) {
 			this._low = this._high
 			this._high = 0
 		} else {
-			this._low = (this._low >>> n) | ( (this._high << (16-n)) & 0xFFFF )
-			this._high = this._high >> n
+			this._low = (this._low >> n) | ( (this._high << (16-n)) & 0xFFFF )
+			this._high >>= n
 		}
 
 		return this
@@ -533,7 +540,7 @@ window['XXH'] = require('xxhash')
 			this._high = this._low
 			this._low = 0
 		} else {
-			this._high = (this._high << n) | (this._low >>> (16-n))
+			this._high = (this._high << n) | (this._low >> (16-n))
 			this._low = (this._low << n) & 0xFFFF
 			if (!allowOverflow) {
 				// Overflow only allowed on the high bits...
@@ -700,7 +707,7 @@ exports.UINT64 = require('./lib/uint64')
 		this.v4 = this.seed.clone().subtract(PRIME32_1)
 		this.total_len = 0
 		this.memsize = 0
-		this.memory = null
+		this.memory = new Buffer(16)
 
 		return this
 	}
@@ -718,9 +725,11 @@ exports.UINT64 = require('./lib/uint64')
 		var len = input.length
 		var bEnd = p + len
 
+		if (len == 0) return this
+
 		this.total_len += len
 
-		if (this.memory == null && this.memsize == 0) this.memory = isString ? '' : new Buffer(16)
+		if (this.memsize == 0 && isString) this.memory = ''
 
 		if (this.memsize + len < 16)   // fill in tmp buffer
 		{
@@ -745,45 +754,51 @@ exports.UINT64 = require('./lib/uint64')
 			}
 
 			var p32 = 0
-
 			if (isString) {
 				this.v1.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v2.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v3.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
+				p32 += 4
 				this.v4.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
+					(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
+				,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
 				)
 			} else {
 				this.v1.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v2.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v3.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
+				p32 += 4
 				this.v4.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
+					(this.memory[p32+1] << 8) | this.memory[p32]
+				,	(this.memory[p32+3] << 8) | this.memory[p32+2]
 				)
 			}
 
 			p += 16 - this.memsize
 			this.memsize = 0
+			if (isString) this.memory = ''
 		}
 
 		if (p <= bEnd - 16)

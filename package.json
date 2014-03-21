@@ -1,6 +1,6 @@
 {
   "name": "xxhashjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "xxHash in Javascript",
   "main": "xxhash.js",
   "scripts": {
@@ -24,6 +24,7 @@
     "cuint": "latest"
   }
 , "devDependencies": {
-    "lmd": "1.11.x"
+    "lmd": "1.11.x",
+    "benchmark": "*"
   }
 }

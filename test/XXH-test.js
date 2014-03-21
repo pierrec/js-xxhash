@@ -1,4 +1,3 @@
-var fs = require('fs')
 var assert = require('assert')
 var XXH = require('..')
 
@@ -82,6 +81,45 @@ describe('XXH', function () {
 		it('should return hash in many steps', function (done) {
 			var H = XXH( seed )
 			var h = H.update( input ).digest().toString(16).toUpperCase()
+
+			assert.equal( h, expected )
+			done()
+		})
+
+	})
+
+	describe('with split medium input', function () {
+		var input = Array(1000).join('abc')
+		var expected = '89DA9B6E'
+
+		it('should return hash with split input < 16', function (done) {
+			var H = XXH( seed )
+			var h = H
+				.update( input.slice(0, 10) )
+				.update( input.slice(10) )
+				.digest().toString(16).toUpperCase()
+
+			assert.equal( h, expected )
+			done()
+		})
+
+		it('should return hash with split input = 16', function (done) {
+			var H = XXH( seed )
+			var h = H
+				.update( input.slice(0, 16) )
+				.update( input.slice(16) )
+				.digest().toString(16).toUpperCase()
+
+			assert.equal( h, expected )
+			done()
+		})
+
+		it('should return hash with split input > 16', function (done) {
+			var H = XXH( seed )
+			var h = H
+				.update( input.slice(0, 20) )
+				.update( input.slice(20) )
+				.digest().toString(16).toUpperCase()
 
 			assert.equal( h, expected )
 			done()

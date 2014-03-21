@@ -102,4 +102,13 @@ describe('div method', function () {
 
   })
 
+  describe('374761393/(16^3)', function () {
+    it('should return 91494', function (done) {
+      var u = UINT32('374761393').div( UINT32(16*16*16) )
+
+      assert.equal( u.toNumber(), 91494 )
+      done()
+    })
+  })
+
 })
