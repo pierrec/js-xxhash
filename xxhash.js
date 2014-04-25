@@ -95,7 +95,7 @@
 		this.v4 = this.seed.clone().subtract(PRIME32_1)
 		this.total_len = 0
 		this.memsize = 0
-		this.memory = new Buffer(16)
+		this.memory = null
 
 		return this
 	}
@@ -117,7 +117,7 @@
 
 		this.total_len += len
 
-		if (this.memsize == 0 && isString) this.memory = ''
+		if (this.memsize == 0) this.memory = isString ? '' : new Buffer(16)
 
 		if (this.memsize + len < 16)   // fill in tmp buffer
 		{
