@@ -104,11 +104,19 @@
 	/**
 	 * Add data to be computed for the XXH hash
 	 * @method update
-	 * @param {String|Buffer} input as a string or nodejs Buffer
+	 * @param {String|Buffer|ArrayBuffer} input as a string or nodejs Buffer or ArrayBuffer
 	 * @return ThisExpression
 	 */
 	XXH.prototype.update = function (input) {
-		var isString = typeof input == 'string'
+		var isString
+		var isArrayBuffer
+
+		if (input instanceof ArrayBuffer)
+		{
+			isArrayBuffer = true
+			input = new Uint8Array(input);
+		}
+
 		var p = 0
 		var len = input.length
 		var bEnd = p + len
@@ -117,13 +125,26 @@
 
 		this.total_len += len
 
-		if (this.memsize == 0) this.memory = isString ? '' : new Buffer(16)
+		if (this.memsize == 0)
+		{
+			if (typeof input == 'string') {
+				isString = true
+				this.memory = ''
+			} else if (isArrayBuffer) {
+				isArrayBuffer = true
+				this.memory = new Uint8Array(16)
+			} else {
+				this.memory = new Buffer(16)
+			}
+		}
 
 		if (this.memsize + len < 16)   // fill in tmp buffer
 		{
 			// XXH_memcpy(this.memory + this.memsize, input, len)
 			if (isString) {
 				this.memory += input
+			} else if (isArrayBuffer) {
+				this.memory.set( input.subarray(0, len), this.memsize )
 			} else {
 				input.copy( this.memory, this.memsize, 0, len )
 			}
@@ -137,6 +158,8 @@
 			// XXH_memcpy(this.memory + this.memsize, input, 16-this.memsize);
 			if (isString) {
 				this.memory += input.slice(0, 16 - this.memsize)
+			} else if (isArrayBuffer) {
+				this.memory.set( input.subarray(0, 16 - this.memsize), this.memsize )
 			} else {
 				input.copy( this.memory, this.memsize, 0, 16 - this.memsize )
 			}
@@ -245,6 +268,8 @@
 			// XXH_memcpy(this.memory, p, bEnd-p);
 			if (isString) {
 				this.memory += input.slice(p)
+			} else if (isArrayBuffer) {
+				this.memory.set( input.subarray(p, bEnd), this.memsize )
 			} else {
 				input.copy( this.memory, this.memsize, p, bEnd )
 			}
