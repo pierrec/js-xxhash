@@ -42,7 +42,7 @@ var h = H.update( 'abcd' ).digest().toString(16)
 
 * In one step:
 `XXH(<data>, <seed>)`
-The data can either be a string or a NodeJS Buffer object.
+The data can either be a string, an ArrayBuffer or a NodeJS Buffer object.
 The seed can either be a number or a UINT32 object.
 
 * In several steps:
@@ -65,7 +65,7 @@ Once `digest()` has been called, the object can be reused. The same seed will be
 * `XXH.init(<seed>)`
 Initialize the XXH object with the given seed. The seed can either be a number or a UINT32 object.
 * `XXH.update(<data>)`
-Add data for hashing. The data can either be a string or a NodeJS Buffer object.
+Add data for hashing. The data can either be a string, an ArrayBuffer or a NodeJS Buffer object.
 * `XXH.digest()` (_UINT32_)
 Finalize the hash calculations and returns an UINT32 object. The hash value can be retrived with toString(<radix>).
 
