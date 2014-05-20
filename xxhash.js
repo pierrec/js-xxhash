@@ -108,7 +108,7 @@
 	 * @return ThisExpression
 	 */
 	XXH.prototype.update = function (input) {
-		var isString
+		var isString = typeof input == 'string'
 		var isArrayBuffer
 
 		if (input instanceof ArrayBuffer)
@@ -127,11 +127,9 @@
 
 		if (this.memsize == 0)
 		{
-			if (typeof input == 'string') {
-				isString = true
+			if (isString) {
 				this.memory = ''
 			} else if (isArrayBuffer) {
-				isArrayBuffer = true
 				this.memory = new Uint8Array(16)
 			} else {
 				this.memory = new Buffer(16)
