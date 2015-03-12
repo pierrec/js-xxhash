@@ -4,7 +4,7 @@
         global_eval = function (code) {
             return global.Function('return ' + code)();
         },
-        
+
         global_document = global.document,
         local_undefined,
         /**
@@ -128,10 +128,10 @@
             'require': lmd_require,
             'initialized': initialized_modules,
 
-            
+
             'document': global_document,
-            
-            
+
+
 
             'on': lmd_on,
             'trigger': lmd_trigger,
@@ -177,7 +177,7 @@ window['XXH'] = require('xxhash')
 	 * @constructor
 	 * @param {Number|String|Number} low bits     | integer as a string 		 | integer as a number
 	 * @param {Number|Number|Undefined} high bits | radix (optional, default=10)
-	 * @return 
+	 * @return
 	 */
 	function UINT32 (l, h) {
 		if ( !(this instanceof UINT32) )
@@ -673,6 +673,38 @@ exports.UINT64 = require('./lib/uint64')
 
 	var PRIME32_1plus2 = PRIME32_1.clone().add(PRIME32_2)
 
+    function toUTF8Array(str) {
+        var utf8 = [];
+        for (var i=0; i < str.length; i++) {
+            var charcode = str.charCodeAt(i);
+            if (charcode < 0x80) utf8.push(charcode);
+            else if (charcode < 0x800) {
+                utf8.push(0xc0 | (charcode >> 6),
+                    0x80 | (charcode & 0x3f));
+            }
+            else if (charcode < 0xd800 || charcode >= 0xe000) {
+                utf8.push(0xe0 | (charcode >> 12),
+                    0x80 | ((charcode>>6) & 0x3f),
+                    0x80 | (charcode & 0x3f));
+            }
+            // surrogate pair
+            else {
+                i++;
+                // UTF-16 encodes 0x10000-0x10FFFF by
+                // subtracting 0x10000 and splitting the
+                // 20 bits of 0x0-0xFFFFF into two halves
+                charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                | (str.charCodeAt(i) & 0x3ff))
+                utf8.push(0xf0 | (charcode >>18),
+                    0x80 | ((charcode>>12) & 0x3f),
+                    0x80 | ((charcode>>6) & 0x3f),
+                    0x80 | (charcode & 0x3f));
+            }
+        }
+
+        return new Uint8Array(utf8);
+    }
+
 	/**
 	 * XXH object used as a constructor or a function
 	 * @constructor
@@ -721,7 +753,13 @@ exports.UINT64 = require('./lib/uint64')
 	 */
 	XXH.prototype.update = function (input) {
 		var isString = typeof input == 'string'
-		var isArrayBuffer
+        var isArrayBuffer
+
+        if(isString) {
+            input = toUTF8Array(input);
+            isString = typeof input == 'string'
+            isArrayBuffer = true
+        }
 
 		if (input instanceof ArrayBuffer)
 		{
