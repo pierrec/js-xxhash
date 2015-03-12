@@ -1,6 +1,6 @@
 {
   "name": "xxhash",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "homepage": "https://github.com/pierrec/js-xxhash",
   "authors": [
     "Pierre Curto <pierre.curto@gmail.com>"

@@ -1,6 +1,6 @@
 {
   "name": "xxhashjs",
-  "version": "0.0.5",
+  "version": "0.1.0",
   "description": "xxHash in Javascript",
   "main": "xxhash.js",
   "scripts": {
