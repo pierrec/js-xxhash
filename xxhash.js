@@ -155,7 +155,7 @@
 			isArrayBuffer = true
 		}
 
-		if (input instanceof ArrayBuffer)
+		if (typeof ArrayBuffer !== "undefined" && input instanceof ArrayBuffer)
 		{
 			isArrayBuffer = true
 			input = new Uint8Array(input);
