@@ -1,18 +1,19 @@
 {
   "name": "xxhashjs",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "xxHash in Javascript",
-  "main": "xxhash.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "mocha"
-  , "prepublish": "lmd build xxhash; lmd build xxhash.min"
+  , "prepublish": "webpack && uglifyjs -m -c -o build/xxhash.min.js build/xxhash.js"
   },
   "repository": {
-    "type": "git",
-    "url": "https://github.com/pierrec/js-xxhash"
+    "type": "git"
+  , "url": "https://github.com/pierrec/js-xxhash"
   },
   "keywords": [
     "xxhash"
+  , "xxh"
   ],
   "author": "Pierre Curto",
   "license": "MIT",
@@ -24,7 +25,8 @@
     "cuint": "latest"
   }
 , "devDependencies": {
-    "lmd": "1.11.x",
-    "benchmark": "*"
+    "webpack": "*"
+  , "uglifyjs": "*"
+  , "benchmark": "*"
   }
 }
