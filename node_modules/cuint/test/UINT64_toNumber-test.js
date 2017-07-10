@@ -49,4 +49,15 @@ describe('toNumber method', function () {
 
   })
 
+  describe('toNumber and toString', function () {
+
+    it('should return the same result for 100 random numbers', function () {
+      for (var i=0; i<100; i++) {
+        var u = UINT64(Math.floor(Math.random() * 0xffffffff), 0);
+        assert.equal(u.toNumber(), parseInt(u.toString()));
+      }
+    })
+
+  })
+
 })

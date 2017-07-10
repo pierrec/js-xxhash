@@ -158,7 +158,7 @@ Multiply two _UINT_. The current _UINT_ stores the result
 Divide two _UINT_. The current _UINT_ stores the result.
 The remainder is made available as the _remainder_ property on the _UINT_ object.
 It can be null, meaning there are no remainder.
-* `UINT.negate()` alias `UINT.not()`
+* `UINT.negate()`
 Negate the current _UINT_
 * `UINT.equals(<uint>)` alias `UINT.eq(<uint>)`
 Equals
@@ -166,6 +166,8 @@ Equals
 Less than (strict)
 * `UINT.greaterThan(<uint>)` alias `UINT.gt(<uint>)`
 Greater than (strict)
+* `UINT.not()`
+Bitwise NOT
 * `UINT.or(<uint>)*`
 Bitwise OR
 * `UINT.and(<uint>)*`

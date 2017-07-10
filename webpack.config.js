@@ -1,7 +1,9 @@
-{
+var path = require("path")
+
+module.exports = {
 	"entry": "./lib/index.js"
 ,	"output": {
-		"path": "./build"
+		"path": __dirname + "/build"
 	,	"filename": "xxhash.js"
 	,	"library": "XXH"
 	}
