@@ -6,5 +6,6 @@ module.exports = {
 		"path": __dirname + "/build"
 	,	"filename": "xxhash.js"
 	,	"library": "XXH"
+	,	"libraryTarget": "umd"
 	}
 }
