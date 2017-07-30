@@ -12,10 +12,10 @@ var seed = 0xABCD
 var suite = new Benchmark.Suite
 suite
 	.add('XXH one step', function() {
-		var h = XXH( input, seed ).toString(16)
+		var h = XXH.h32( input, seed ).toString(16)
 	})
 	.add('XXH', function() {
-		var h = XXH(seed).update(input).digest().toString(16)
+		var h = XXH.h32(seed).update(input).digest().toString(16)
 	})
 	// add listeners
 	.on('cycle', function(event) {
