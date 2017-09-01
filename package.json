@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/pierrec/js-xxhash"
 , "dependencies": {
-    "cuint": "latest"
+    "cuint": "^0.2.2"
   }
 , "devDependencies": {
     "webpack": "*"
