@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-xxHash is a very fast hashing algorithm (see the details [here](https://code.google.com/p/xxhash/)). xxhashjs is a Javascript implementation of it, written in 100% Javascript. Although not as fast as the C version, it does perform pretty well given the current Javascript limitations in handling unsigned 32 bits integers.
+xxHash is a very fast hashing algorithm (see the details [here](https://github.com/Cyan4973/xxHash)). xxhashjs is a Javascript implementation of it, written in 100% Javascript. Although not as fast as the C version, it does perform pretty well given the current Javascript limitations in handling unsigned 32 bits integers.
 
 
 ## Installation
