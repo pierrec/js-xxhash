@@ -72,8 +72,7 @@ Once `digest()` has been called, the object can be reused. The same seed will be
 	Initialize the XXH object with the given seed. The seed can either be a number or a UINT32 object.
 	* `.update(<data>)`
 	Add data for hashing. The data can either be a string, an ArrayBuffer or a NodeJS Buffer object.
-
-* `digest()` (_UINT32_)
+        * `digest()` (_UINT32_)
 	Finalize the hash calculations and returns an UINT32 object. The hash value can be retrieved with toString(<radix>).
 
 * `XXH.h64()`
