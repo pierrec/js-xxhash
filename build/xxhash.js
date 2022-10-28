@@ -7,7 +7,7 @@
 		exports["XXH"] = factory();
 	else
 		root["XXH"] = factory();
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -81,7 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* WEBPACK VAR INJECTION */(function(global) {/*!
  * The buffer module from node.js, for the browser.
  *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @author   Feross Aboukhadijeh <http://feross.org>
  * @license  MIT
  */
 /* eslint-disable no-proto */
@@ -2030,24 +2030,25 @@ XXH.prototype.init = init
 /**
  * Add data to be computed for the XXH hash
  * @method update
- * @param {String|Buffer|ArrayBuffer} input as a string or nodejs Buffer or ArrayBuffer
+ * @param {String|Buffer|ArrayBuffer|Uint8Array} input as a string or nodejs Buffer or ArrayBuffer or Uint8Array
  * @return ThisExpression
  */
 XXH.prototype.update = function (input) {
-	var isString = typeof input == 'string'
 	var isArrayBuffer
 
 	// Convert all strings to utf-8 first (issue #5)
-	if (isString) {
+	if (typeof input == 'string') {
 		input = toUTF8Array(input)
-		isString = false
 		isArrayBuffer = true
 	}
-
-	if (typeof ArrayBuffer !== "undefined" && input instanceof ArrayBuffer)
+	else if (typeof ArrayBuffer !== "undefined" && input instanceof ArrayBuffer)
 	{
 		isArrayBuffer = true
 		input = new Uint8Array(input);
+	}
+	else if (input instanceof Uint8Array)
+	{
+		isArrayBuffer = true
 	}
 
 	var p = 0
@@ -2060,9 +2061,7 @@ XXH.prototype.update = function (input) {
 
 	if (this.memsize == 0)
 	{
-		if (isString) {
-			this.memory = ''
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory = new Uint8Array(16)
 		} else {
 			this.memory = new Buffer(16)
@@ -2072,9 +2071,7 @@ XXH.prototype.update = function (input) {
 	if (this.memsize + len < 16)   // fill in tmp buffer
 	{
 		// XXH_memcpy(this.memory + this.memsize, input, len)
-		if (isString) {
-			this.memory += input
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(0, len), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, 0, len )
@@ -2087,60 +2084,35 @@ XXH.prototype.update = function (input) {
 	if (this.memsize > 0)   // some data left from previous update
 	{
 		// XXH_memcpy(this.memory + this.memsize, input, 16-this.memsize);
-		if (isString) {
-			this.memory += input.slice(0, 16 - this.memsize)
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(0, 16 - this.memsize), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, 0, 16 - this.memsize )
 		}
 
 		var p32 = 0
-		if (isString) {
-			this.v1.xxh_update(
-				(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
-			,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
-			)
-			p32 += 4
-			this.v2.xxh_update(
-				(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
-			,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
-			)
-			p32 += 4
-			this.v3.xxh_update(
-				(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
-			,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
-			)
-			p32 += 4
-			this.v4.xxh_update(
-				(this.memory.charCodeAt(p32+1) << 8) | this.memory.charCodeAt(p32)
-			,	(this.memory.charCodeAt(p32+3) << 8) | this.memory.charCodeAt(p32+2)
-			)
-		} else {
-			this.v1.xxh_update(
-				(this.memory[p32+1] << 8) | this.memory[p32]
-			,	(this.memory[p32+3] << 8) | this.memory[p32+2]
-			)
-			p32 += 4
-			this.v2.xxh_update(
-				(this.memory[p32+1] << 8) | this.memory[p32]
-			,	(this.memory[p32+3] << 8) | this.memory[p32+2]
-			)
-			p32 += 4
-			this.v3.xxh_update(
-				(this.memory[p32+1] << 8) | this.memory[p32]
-			,	(this.memory[p32+3] << 8) | this.memory[p32+2]
-			)
-			p32 += 4
-			this.v4.xxh_update(
-				(this.memory[p32+1] << 8) | this.memory[p32]
-			,	(this.memory[p32+3] << 8) | this.memory[p32+2]
-			)
-		}
+		this.v1.xxh_update(
+			(this.memory[p32+1] << 8) | this.memory[p32]
+		,	(this.memory[p32+3] << 8) | this.memory[p32+2]
+		)
+		p32 += 4
+		this.v2.xxh_update(
+			(this.memory[p32+1] << 8) | this.memory[p32]
+		,	(this.memory[p32+3] << 8) | this.memory[p32+2]
+		)
+		p32 += 4
+		this.v3.xxh_update(
+			(this.memory[p32+1] << 8) | this.memory[p32]
+		,	(this.memory[p32+3] << 8) | this.memory[p32+2]
+		)
+		p32 += 4
+		this.v4.xxh_update(
+			(this.memory[p32+1] << 8) | this.memory[p32]
+		,	(this.memory[p32+3] << 8) | this.memory[p32+2]
+		)
 
 		p += 16 - this.memsize
 		this.memsize = 0
-		if (isString) this.memory = ''
 	}
 
 	if (p <= bEnd - 16)
@@ -2149,47 +2121,25 @@ XXH.prototype.update = function (input) {
 
 		do
 		{
-			if (isString) {
-				this.v1.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-				)
-				p += 4
-				this.v2.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-				)
-				p += 4
-				this.v3.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-				)
-				p += 4
-				this.v4.xxh_update(
-					(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-				,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-				)
-			} else {
-				this.v1.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-				p += 4
-				this.v2.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-				p += 4
-				this.v3.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-				p += 4
-				this.v4.xxh_update(
-					(input[p+1] << 8) | input[p]
-				,	(input[p+3] << 8) | input[p+2]
-				)
-			}
+			this.v1.xxh_update(
+				(input[p+1] << 8) | input[p]
+			,	(input[p+3] << 8) | input[p+2]
+			)
+			p += 4
+			this.v2.xxh_update(
+				(input[p+1] << 8) | input[p]
+			,	(input[p+3] << 8) | input[p+2]
+			)
+			p += 4
+			this.v3.xxh_update(
+				(input[p+1] << 8) | input[p]
+			,	(input[p+3] << 8) | input[p+2]
+			)
+			p += 4
+			this.v4.xxh_update(
+				(input[p+1] << 8) | input[p]
+			,	(input[p+3] << 8) | input[p+2]
+			)
 			p += 4
 		} while (p <= limit)
 	}
@@ -2197,9 +2147,7 @@ XXH.prototype.update = function (input) {
 	if (p < bEnd)
 	{
 		// XXH_memcpy(this.memory, p, bEnd-p);
-		if (isString) {
-			this.memory += input.slice(p)
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(p, bEnd), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, p, bEnd )
@@ -2218,7 +2166,6 @@ XXH.prototype.update = function (input) {
  */
 XXH.prototype.digest = function () {
 	var input = this.memory
-	var isString = typeof input == 'string'
 	var p = 0
 	var bEnd = this.memsize
 	var h32, h
@@ -2237,17 +2184,10 @@ XXH.prototype.digest = function () {
 
 	while (p <= bEnd - 4)
 	{
-		if (isString) {
-			u.fromBits(
-				(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-			,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-			)
-		} else {
-			u.fromBits(
-				(input[p+1] << 8) | input[p]
-			,	(input[p+3] << 8) | input[p+2]
-			)
-		}
+		u.fromBits(
+			(input[p+1] << 8) | input[p]
+		,	(input[p+3] << 8) | input[p+2]
+		)
 		h32
 			.add( u.multiply(PRIME32_3) )
 			.rotl(17)
@@ -2257,7 +2197,7 @@ XXH.prototype.digest = function () {
 
 	while (p < bEnd)
 	{
-		u.fromBits( isString ? input.charCodeAt(p++) : input[p++], 0 )
+		u.fromBits( input[p++], 0 )
 		h32
 			.add( u.multiply(PRIME32_5) )
 			.rotl(11)
@@ -2331,68 +2271,103 @@ for (var i = 0, len = code.length; i < len; ++i) {
   revLookup[code.charCodeAt(i)] = i
 }
 
+// Support decoding URL-safe base64 strings, as Node.js does.
+// See: https://en.wikipedia.org/wiki/Base64#URL_applications
 revLookup['-'.charCodeAt(0)] = 62
 revLookup['_'.charCodeAt(0)] = 63
 
-function placeHoldersCount (b64) {
+function getLens (b64) {
   var len = b64.length
+
   if (len % 4 > 0) {
     throw new Error('Invalid string. Length must be a multiple of 4')
   }
 
-  // the number of equal signs (place holders)
-  // if there are two placeholders, than the two characters before it
-  // represent one byte
-  // if there is only one, then the three characters before it represent 2 bytes
-  // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+  // Trim off extra bytes after placeholder bytes are found
+  // See: https://github.com/beatgammit/base64-js/issues/42
+  var validLen = b64.indexOf('=')
+  if (validLen === -1) validLen = len
+
+  var placeHoldersLen = validLen === len
+    ? 0
+    : 4 - (validLen % 4)
+
+  return [validLen, placeHoldersLen]
 }
 
+// base64 is 4/3 + up to two characters of the original data
 function byteLength (b64) {
-  // base64 is 4/3 + up to two characters of the original data
-  return (b64.length * 3 / 4) - placeHoldersCount(b64)
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
+}
+
+function _byteLength (b64, validLen, placeHoldersLen) {
+  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
 function toByteArray (b64) {
-  var i, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
+  var tmp
+  var lens = getLens(b64)
+  var validLen = lens[0]
+  var placeHoldersLen = lens[1]
 
-  arr = new Arr((len * 3 / 4) - placeHolders)
+  var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen))
+
+  var curByte = 0
 
   // if there are placeholders, only get up to the last complete 4 chars
-  l = placeHolders > 0 ? len - 4 : len
+  var len = placeHoldersLen > 0
+    ? validLen - 4
+    : validLen
 
-  var L = 0
-
-  for (i = 0; i < l; i += 4) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
-    arr[L++] = (tmp >> 16) & 0xFF
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
+  var i
+  for (i = 0; i < len; i += 4) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 18) |
+      (revLookup[b64.charCodeAt(i + 1)] << 12) |
+      (revLookup[b64.charCodeAt(i + 2)] << 6) |
+      revLookup[b64.charCodeAt(i + 3)]
+    arr[curByte++] = (tmp >> 16) & 0xFF
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
   }
 
-  if (placeHolders === 2) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[L++] = tmp & 0xFF
-  } else if (placeHolders === 1) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
+  if (placeHoldersLen === 2) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 2) |
+      (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[curByte++] = tmp & 0xFF
+  }
+
+  if (placeHoldersLen === 1) {
+    tmp =
+      (revLookup[b64.charCodeAt(i)] << 10) |
+      (revLookup[b64.charCodeAt(i + 1)] << 4) |
+      (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[curByte++] = (tmp >> 8) & 0xFF
+    arr[curByte++] = tmp & 0xFF
   }
 
   return arr
 }
 
 function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+  return lookup[num >> 18 & 0x3F] +
+    lookup[num >> 12 & 0x3F] +
+    lookup[num >> 6 & 0x3F] +
+    lookup[num & 0x3F]
 }
 
 function encodeChunk (uint8, start, end) {
   var tmp
   var output = []
   for (var i = start; i < end; i += 3) {
-    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    tmp =
+      ((uint8[i] << 16) & 0xFF0000) +
+      ((uint8[i + 1] << 8) & 0xFF00) +
+      (uint8[i + 2] & 0xFF)
     output.push(tripletToBase64(tmp))
   }
   return output.join('')
@@ -2402,7 +2377,6 @@ function fromByteArray (uint8) {
   var tmp
   var len = uint8.length
   var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var output = ''
   var parts = []
   var maxChunkLength = 16383 // must be multiple of 3
 
@@ -2414,18 +2388,20 @@ function fromByteArray (uint8) {
   // pad the end with zeros, but make sure to not forget the extra bytes
   if (extraBytes === 1) {
     tmp = uint8[len - 1]
-    output += lookup[tmp >> 2]
-    output += lookup[(tmp << 4) & 0x3F]
-    output += '=='
+    parts.push(
+      lookup[tmp >> 2] +
+      lookup[(tmp << 4) & 0x3F] +
+      '=='
+    )
   } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
-    output += lookup[tmp >> 10]
-    output += lookup[(tmp >> 4) & 0x3F]
-    output += lookup[(tmp << 2) & 0x3F]
-    output += '='
+    tmp = (uint8[len - 2] << 8) + uint8[len - 1]
+    parts.push(
+      lookup[tmp >> 10] +
+      lookup[(tmp >> 4) & 0x3F] +
+      lookup[(tmp << 2) & 0x3F] +
+      '='
+    )
   }
-
-  parts.push(output)
 
   return parts.join('')
 }
@@ -2435,9 +2411,10 @@ function fromByteArray (uint8) {
 /* 6 */
 /***/ (function(module, exports) {
 
+/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var nBits = -7
@@ -2450,12 +2427,12 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   e = s & ((1 << (-nBits)) - 1)
   s >>= (-nBits)
   nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   m = e & ((1 << (-nBits)) - 1)
   e >>= (-nBits)
   nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}
 
   if (e === 0) {
     e = 1 - eBias
@@ -2470,7 +2447,7 @@ exports.read = function (buffer, offset, isLE, mLen, nBytes) {
 
 exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
+  var eLen = (nBytes * 8) - mLen - 1
   var eMax = (1 << eLen) - 1
   var eBias = eMax >> 1
   var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
@@ -2503,7 +2480,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
       m = 0
       e = eMax
     } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
+      m = ((value * c) - 1) * Math.pow(2, mLen)
       e = e + eBias
     } else {
       m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
@@ -2975,9 +2952,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 	if (true) {
 		// AMD / RequireJS
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return UINT32
-		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+		}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 	} else if (typeof module != 'undefined' && module.exports) {
 		// Node.js
@@ -3630,9 +3607,9 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/**
 
 	if (true) {
 		// AMD / RequireJS
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return UINT64
-		}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+		}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
 	} else if (typeof module != 'undefined' && module.exports) {
 		// Node.js
@@ -3746,24 +3723,25 @@ XXH64.prototype.init = init
 /**
  * Add data to be computed for the XXH64 hash
  * @method update
- * @param {String|Buffer|ArrayBuffer} input as a string or nodejs Buffer or ArrayBuffer
+ * @param {String|Buffer|ArrayBuffer|Uint8Array} input as a string or nodejs Buffer or ArrayBuffer or Uint8Array
  * @return ThisExpression
  */
 XXH64.prototype.update = function (input) {
-	var isString = typeof input == 'string'
 	var isArrayBuffer
 
 	// Convert all strings to utf-8 first (issue #5)
-	if (isString) {
+	if (typeof input == 'string') {
 		input = toUTF8Array(input)
-		isString = false
 		isArrayBuffer = true
 	}
-
-	if (typeof ArrayBuffer !== "undefined" && input instanceof ArrayBuffer)
+	else if (typeof ArrayBuffer !== "undefined" && input instanceof ArrayBuffer)
 	{
 		isArrayBuffer = true
 		input = new Uint8Array(input);
+	}
+	else if (input instanceof Uint8Array)
+	{
+		isArrayBuffer = true
 	}
 
 	var p = 0
@@ -3776,9 +3754,7 @@ XXH64.prototype.update = function (input) {
 
 	if (this.memsize == 0)
 	{
-		if (isString) {
-			this.memory = ''
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory = new Uint8Array(32)
 		} else {
 			this.memory = new Buffer(32)
@@ -3788,9 +3764,7 @@ XXH64.prototype.update = function (input) {
 	if (this.memsize + len < 32)   // fill in tmp buffer
 	{
 		// XXH64_memcpy(this.memory + this.memsize, input, len)
-		if (isString) {
-			this.memory += input
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(0, len), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, 0, len )
@@ -3803,86 +3777,48 @@ XXH64.prototype.update = function (input) {
 	if (this.memsize > 0)   // some data left from previous update
 	{
 		// XXH64_memcpy(this.memory + this.memsize, input, 16-this.memsize);
-		if (isString) {
-			this.memory += input.slice(0, 32 - this.memsize)
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(0, 32 - this.memsize), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, 0, 32 - this.memsize )
 		}
 
 		var p64 = 0
-		if (isString) {
-			var other
-			other = UINT64(
-					(this.memory.charCodeAt(p64+1) << 8) | this.memory.charCodeAt(p64)
-				,	(this.memory.charCodeAt(p64+3) << 8) | this.memory.charCodeAt(p64+2)
-				,	(this.memory.charCodeAt(p64+5) << 8) | this.memory.charCodeAt(p64+4)
-				,	(this.memory.charCodeAt(p64+7) << 8) | this.memory.charCodeAt(p64+6)
-				)
-			this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory.charCodeAt(p64+1) << 8) | this.memory.charCodeAt(p64)
-				,	(this.memory.charCodeAt(p64+3) << 8) | this.memory.charCodeAt(p64+2)
-				,	(this.memory.charCodeAt(p64+5) << 8) | this.memory.charCodeAt(p64+4)
-				,	(this.memory.charCodeAt(p64+7) << 8) | this.memory.charCodeAt(p64+6)
-				)
-			this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory.charCodeAt(p64+1) << 8) | this.memory.charCodeAt(p64)
-				,	(this.memory.charCodeAt(p64+3) << 8) | this.memory.charCodeAt(p64+2)
-				,	(this.memory.charCodeAt(p64+5) << 8) | this.memory.charCodeAt(p64+4)
-				,	(this.memory.charCodeAt(p64+7) << 8) | this.memory.charCodeAt(p64+6)
-				)
-			this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory.charCodeAt(p64+1) << 8) | this.memory.charCodeAt(p64)
-				,	(this.memory.charCodeAt(p64+3) << 8) | this.memory.charCodeAt(p64+2)
-				,	(this.memory.charCodeAt(p64+5) << 8) | this.memory.charCodeAt(p64+4)
-				,	(this.memory.charCodeAt(p64+7) << 8) | this.memory.charCodeAt(p64+6)
-				)
-			this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-		} else {
-			var other
-			other = UINT64(
-					(this.memory[p64+1] << 8) | this.memory[p64]
-				,	(this.memory[p64+3] << 8) | this.memory[p64+2]
-				,	(this.memory[p64+5] << 8) | this.memory[p64+4]
-				,	(this.memory[p64+7] << 8) | this.memory[p64+6]
-				)
-			this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory[p64+1] << 8) | this.memory[p64]
-				,	(this.memory[p64+3] << 8) | this.memory[p64+2]
-				,	(this.memory[p64+5] << 8) | this.memory[p64+4]
-				,	(this.memory[p64+7] << 8) | this.memory[p64+6]
-				)
-			this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory[p64+1] << 8) | this.memory[p64]
-				,	(this.memory[p64+3] << 8) | this.memory[p64+2]
-				,	(this.memory[p64+5] << 8) | this.memory[p64+4]
-				,	(this.memory[p64+7] << 8) | this.memory[p64+6]
-				)
-			this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			p64 += 8
-			other = UINT64(
-					(this.memory[p64+1] << 8) | this.memory[p64]
-				,	(this.memory[p64+3] << 8) | this.memory[p64+2]
-				,	(this.memory[p64+5] << 8) | this.memory[p64+4]
-				,	(this.memory[p64+7] << 8) | this.memory[p64+6]
-				)
-			this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-		}
+		var other
+		other = UINT64(
+				(this.memory[p64+1] << 8) | this.memory[p64]
+			,	(this.memory[p64+3] << 8) | this.memory[p64+2]
+			,	(this.memory[p64+5] << 8) | this.memory[p64+4]
+			,	(this.memory[p64+7] << 8) | this.memory[p64+6]
+			)
+		this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+		p64 += 8
+		other = UINT64(
+				(this.memory[p64+1] << 8) | this.memory[p64]
+			,	(this.memory[p64+3] << 8) | this.memory[p64+2]
+			,	(this.memory[p64+5] << 8) | this.memory[p64+4]
+			,	(this.memory[p64+7] << 8) | this.memory[p64+6]
+			)
+		this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+		p64 += 8
+		other = UINT64(
+				(this.memory[p64+1] << 8) | this.memory[p64]
+			,	(this.memory[p64+3] << 8) | this.memory[p64+2]
+			,	(this.memory[p64+5] << 8) | this.memory[p64+4]
+			,	(this.memory[p64+7] << 8) | this.memory[p64+6]
+			)
+		this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+		p64 += 8
+		other = UINT64(
+				(this.memory[p64+1] << 8) | this.memory[p64]
+			,	(this.memory[p64+3] << 8) | this.memory[p64+2]
+			,	(this.memory[p64+5] << 8) | this.memory[p64+4]
+			,	(this.memory[p64+7] << 8) | this.memory[p64+6]
+			)
+		this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
 
 		p += 32 - this.memsize
 		this.memsize = 0
-		if (isString) this.memory = ''
 	}
 
 	if (p <= bEnd - 32)
@@ -3891,73 +3827,38 @@ XXH64.prototype.update = function (input) {
 
 		do
 		{
-			if (isString) {
-				var other
-				other = UINT64(
-						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-					,	(input.charCodeAt(p+5) << 8) | input.charCodeAt(p+4)
-					,	(input.charCodeAt(p+7) << 8) | input.charCodeAt(p+6)
-					)
-				this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-					,	(input.charCodeAt(p+5) << 8) | input.charCodeAt(p+4)
-					,	(input.charCodeAt(p+7) << 8) | input.charCodeAt(p+6)
-					)
-				this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-					,	(input.charCodeAt(p+5) << 8) | input.charCodeAt(p+4)
-					,	(input.charCodeAt(p+7) << 8) | input.charCodeAt(p+6)
-					)
-				this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-					,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-					,	(input.charCodeAt(p+5) << 8) | input.charCodeAt(p+4)
-					,	(input.charCodeAt(p+7) << 8) | input.charCodeAt(p+6)
-					)
-				this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			} else {
-				var other
-				other = UINT64(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					,	(input[p+5] << 8) | input[p+4]
-					,	(input[p+7] << 8) | input[p+6]
-					)
-				this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					,	(input[p+5] << 8) | input[p+4]
-					,	(input[p+7] << 8) | input[p+6]
-					)
-				this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					,	(input[p+5] << 8) | input[p+4]
-					,	(input[p+7] << 8) | input[p+6]
-					)
-				this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-				p += 8
-				other = UINT64(
-						(input[p+1] << 8) | input[p]
-					,	(input[p+3] << 8) | input[p+2]
-					,	(input[p+5] << 8) | input[p+4]
-					,	(input[p+7] << 8) | input[p+6]
-					)
-				this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
-			}
+			var other
+			other = UINT64(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				,	(input[p+5] << 8) | input[p+4]
+				,	(input[p+7] << 8) | input[p+6]
+				)
+			this.v1.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+			p += 8
+			other = UINT64(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				,	(input[p+5] << 8) | input[p+4]
+				,	(input[p+7] << 8) | input[p+6]
+				)
+			this.v2.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+			p += 8
+			other = UINT64(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				,	(input[p+5] << 8) | input[p+4]
+				,	(input[p+7] << 8) | input[p+6]
+				)
+			this.v3.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
+			p += 8
+			other = UINT64(
+					(input[p+1] << 8) | input[p]
+				,	(input[p+3] << 8) | input[p+2]
+				,	(input[p+5] << 8) | input[p+4]
+				,	(input[p+7] << 8) | input[p+6]
+				)
+			this.v4.add( other.multiply(PRIME64_2) ).rotl(31).multiply(PRIME64_1);
 			p += 8
 		} while (p <= limit)
 	}
@@ -3965,9 +3866,7 @@ XXH64.prototype.update = function (input) {
 	if (p < bEnd)
 	{
 		// XXH64_memcpy(this.memory, p, bEnd-p);
-		if (isString) {
-			this.memory += input.slice(p)
-		} else if (isArrayBuffer) {
+		if (isArrayBuffer) {
 			this.memory.set( input.subarray(p, bEnd), this.memsize )
 		} else {
 			input.copy( this.memory, this.memsize, p, bEnd )
@@ -3986,7 +3885,6 @@ XXH64.prototype.update = function (input) {
  */
 XXH64.prototype.digest = function () {
 	var input = this.memory
-	var isString = typeof input == 'string'
 	var p = 0
 	var bEnd = this.memsize
 	var h64, h
@@ -4020,21 +3918,12 @@ XXH64.prototype.digest = function () {
 
 	while (p <= bEnd - 8)
 	{
-		if (isString) {
-			u.fromBits(
-				(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-			,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-			,	(input.charCodeAt(p+5) << 8) | input.charCodeAt(p+4)
-			,	(input.charCodeAt(p+7) << 8) | input.charCodeAt(p+6)
+		u.fromBits(
+			(input[p+1] << 8) | input[p]
+		,	(input[p+3] << 8) | input[p+2]
+		,	(input[p+5] << 8) | input[p+4]
+		,	(input[p+7] << 8) | input[p+6]
 			)
-		} else {
-			u.fromBits(
-				(input[p+1] << 8) | input[p]
-			,	(input[p+3] << 8) | input[p+2]
-			,	(input[p+5] << 8) | input[p+4]
-			,	(input[p+7] << 8) | input[p+6]
-			)
-		}
 		u.multiply(PRIME64_2).rotl(31).multiply(PRIME64_1)
 		h64
 			.xor(u)
@@ -4045,21 +3934,12 @@ XXH64.prototype.digest = function () {
 	}
 
 	if (p + 4 <= bEnd) {
-		if (isString) {
-			u.fromBits(
-				(input.charCodeAt(p+1) << 8) | input.charCodeAt(p)
-			,	(input.charCodeAt(p+3) << 8) | input.charCodeAt(p+2)
-			,	0
-			,	0
-			)
-		} else {
-			u.fromBits(
-				(input[p+1] << 8) | input[p]
-			,	(input[p+3] << 8) | input[p+2]
-			,	0
-			,	0
-			)
-		}
+		u.fromBits(
+			(input[p+1] << 8) | input[p]
+		,	(input[p+3] << 8) | input[p+2]
+		,	0
+		,	0
+		)
 		h64
 			.xor( u.multiply(PRIME64_1) )
 			.rotl(23)
@@ -4070,7 +3950,7 @@ XXH64.prototype.digest = function () {
 
 	while (p < bEnd)
 	{
-		u.fromBits( isString ? input.charCodeAt(p++) : input[p++], 0, 0, 0 )
+		u.fromBits( input[p++], 0, 0, 0 )
 		h64
 			.xor( u.multiply(PRIME64_5) )
 			.rotl(11)
